@@ -1,0 +1,44 @@
+
+services:
+  php:
+    build: 
+      context: ./.docker/php
+      args:
+        user: 1000
+        uid: 1000
+    volumes:
+      - ./:/var/www
+    networks:
+      - application_network
+  
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./:/var/www
+      - ./.docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - application_network
+  
+  mysql:
+    image: mysql:8
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "root123"
+      MYSQL_USER: "lucas"
+      MYSQL_PASSWORD: "12345"
+      MYSQL_DATABASE: "laravel"
+    networks:
+      - application_network
+    volumes:
+      - mysqldata:/var/lib/mysql
+
+networks:
+  application_network:
+    driver: bridge
+
+volumes:
+  mysqldata:
+    driver: local
